@@ -209,7 +209,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/exportXmlXlsx", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public byte[] exportXmlXlsx() throws IOException, TemplateException {
+    public byte[] exportXmlXlsx(HttpServletResponse response) throws IOException, TemplateException {
 
         Template template = configuration.getTemplate("users.ftl");
 
@@ -225,6 +225,9 @@ public class UserController {
 
         byte[] data = baos.toByteArray();
         baos.close();
+
+        String filename = UUID.randomUUID().toString() + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
         return data;
     }

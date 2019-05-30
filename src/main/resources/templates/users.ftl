@@ -312,10 +312,10 @@
                     <Data ss:Type="String">${user.bonus}</Data>
                 </Cell>
                 <Cell>
-                    <Data ss:Type="String">${user.enabled}</Data>
+                    <Data ss:Type="String">${user.enabled?c}</Data>
                 </Cell>
                 <Cell>
-                    <Data ss:Type="String">${user.createTime}</Data>
+                    <Data ss:Type="String">${user.createTime?datetime}</Data>
                 </Cell>
             </Row>
             </#list>
