@@ -1,5 +1,8 @@
 package io.cjf.testoffice.controller;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.cjf.testoffice.dao.UserMapper;
 import io.cjf.testoffice.enumeration.Gender;
 import io.cjf.testoffice.po.User;
@@ -19,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/user")
@@ -31,6 +34,9 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private Configuration configuration;
 
     @GetMapping("/getAll")
     public List<User> getAll() {
@@ -198,6 +204,27 @@ public class UserController {
 
         String filename = UUID.randomUUID().toString() + ".xlsx";
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+
+        return data;
+    }
+
+    @GetMapping(value = "/exportXmlXlsx", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public byte[] exportXmlXlsx() throws IOException, TemplateException {
+
+        Template template = configuration.getTemplate("users.ftl");
+
+        List<User> users = userMapper.selectAll();
+        Map root = new HashMap<>();
+        root.put("users", users);
+
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Writer out = new OutputStreamWriter(baos);
+        template.process(root, out);
+        out.close();
+
+        byte[] data = baos.toByteArray();
+        baos.close();
 
         return data;
     }
