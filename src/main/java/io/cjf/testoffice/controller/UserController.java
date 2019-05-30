@@ -321,4 +321,10 @@ public class UserController {
         User user = userMapper.selectByPrimaryKey(userId);
         return user;
     }
+
+    @GetMapping("/getByIds")
+    public List<User> getByIds(@RequestParam List<Long> userIds){
+        List<User> users = userMapper.selectByIds(userIds);
+        return users;
+    }
 }

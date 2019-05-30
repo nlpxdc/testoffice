@@ -145,4 +145,14 @@
     <include refid="Base_Column_List" />
     from user
   </select>
+  <select id="selectByIds" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where user_id in
+    <foreach item="userId" index="index" collection="userIds"
+             open="(" separator="," close=")">
+      #{userId}
+    </foreach>
+  </select>
 </mapper>
