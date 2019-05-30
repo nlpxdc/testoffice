@@ -1,6 +1,7 @@
 package io.cjf.testoffice.controller;
 
 import io.cjf.testoffice.dao.UserMapper;
+import io.cjf.testoffice.enumeration.Gender;
 import io.cjf.testoffice.po.User;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -32,7 +33,7 @@ public class UserController {
     private UserMapper userMapper;
 
     @GetMapping("/getAll")
-    public List<User> getAll(){
+    public List<User> getAll() {
         List<User> users = userMapper.selectAll();
         return users;
     }
@@ -69,22 +70,22 @@ public class UserController {
                 if (value instanceof String) {
                     cell.setCellValue((String) value);
                 }
-                if (value instanceof Long){
+                if (value instanceof Long) {
                     cell.setCellValue((Long) value);
                 }
-                if (value instanceof Integer){
+                if (value instanceof Integer) {
                     cell.setCellValue((Integer) value);
                 }
-                if (value instanceof Short){
+                if (value instanceof Short) {
                     cell.setCellValue((Short) value);
                 }
-                if (value instanceof Byte){
+                if (value instanceof Byte) {
                     cell.setCellValue((Byte) value);
                 }
-                if (value instanceof Double){
+                if (value instanceof Double) {
                     cell.setCellValue((Double) value);
                 }
-                if (value instanceof Float){
+                if (value instanceof Float) {
                     cell.setCellValue((Float) value);
                 }
                 if (value instanceof Boolean) {
@@ -93,6 +94,16 @@ public class UserController {
                 if (value instanceof Date) {
                     Date date = (Date) value;
                     cell.setCellValue(date.toString());
+                }
+
+                String name = field.getName();
+                if (name.equals("gender")) {
+                    byte numericCellValue = (byte) cell.getNumericCellValue();
+                    cell.setCellValue(String.valueOf(Gender.values()[numericCellValue]));
+                }
+                if (name.equals("enabled")){
+                    boolean enabled = cell.getBooleanCellValue();
+                    cell.setCellValue(enabled ? "启用" : "禁用");
                 }
             }
         }
@@ -104,7 +115,7 @@ public class UserController {
         baos.close();
 
         String filename = UUID.randomUUID().toString() + ".xls";
-        response.setHeader("Content-Disposition", "attachment; filename="+filename);
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
         return data;
     }
