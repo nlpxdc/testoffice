@@ -324,9 +324,13 @@ public class UserController {
     }
 
     @GetMapping(value = "/getJsonFileById", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public byte[] getJsonFileById(@RequestParam Long userId){
+    public byte[] getJsonFileById(@RequestParam Long userId, HttpServletResponse response){
         User user = userMapper.selectByPrimaryKey(userId);
         String dataStr = JSON.toJSONString(user);
+
+        String filename = UUID.randomUUID().toString() + ".json";
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+
         return dataStr.getBytes();
     }
 
