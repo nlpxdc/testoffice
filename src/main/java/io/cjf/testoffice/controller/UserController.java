@@ -1,5 +1,6 @@
 package io.cjf.testoffice.controller;
 
+import com.alibaba.fastjson.JSON;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -320,6 +321,13 @@ public class UserController {
     public User getById(@RequestParam Long userId){
         User user = userMapper.selectByPrimaryKey(userId);
         return user;
+    }
+
+    @GetMapping(value = "/getJsonFileById", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public byte[] getJsonFileById(@RequestParam Long userId){
+        User user = userMapper.selectByPrimaryKey(userId);
+        String dataStr = JSON.toJSONString(user);
+        return dataStr.getBytes();
     }
 
     @GetMapping("/getByIds")
