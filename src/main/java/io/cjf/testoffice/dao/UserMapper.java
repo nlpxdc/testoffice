@@ -2,6 +2,8 @@ package io.cjf.testoffice.dao;
 
 import io.cjf.testoffice.po.User;
 
+import java.util.List;
+
 public interface UserMapper {
     int deleteByPrimaryKey(Long userId);
 
@@ -14,4 +16,7 @@ public interface UserMapper {
     int updateByPrimaryKeySelective(User record);
 
     int updateByPrimaryKey(User record);
+
+//    custom
+    List<User> selectAll();
 }
