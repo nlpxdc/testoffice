@@ -113,7 +113,7 @@ public class UserController {
                     byte numericCellValue = (byte) cell.getNumericCellValue();
                     cell.setCellValue(String.valueOf(Gender.values()[numericCellValue]));
                 }
-                if (name.equals("enabled")){
+                if (name.equals("enabled")) {
                     boolean enabled = cell.getBooleanCellValue();
                     cell.setCellValue(enabled ? "启用" : "禁用");
                 }
@@ -195,7 +195,7 @@ public class UserController {
                     byte numericCellValue = (byte) cell.getNumericCellValue();
                     cell.setCellValue(String.valueOf(Gender.values()[numericCellValue]));
                 }
-                if (name.equals("enabled")){
+                if (name.equals("enabled")) {
                     boolean enabled = cell.getBooleanCellValue();
                     cell.setCellValue(enabled ? "启用" : "禁用");
                 }
@@ -277,7 +277,7 @@ public class UserController {
                     byte numericCellValue = (byte) cell.getNumericCellValue();
                     cell.setCellValue(String.valueOf(Gender.values()[numericCellValue]));
                 }
-                if (name.equals("enabled")){
+                if (name.equals("enabled")) {
                     boolean enabled = cell.getBooleanCellValue();
                     cell.setCellValue(enabled ? "启用" : "禁用");
                 }
@@ -321,13 +321,13 @@ public class UserController {
     }
 
     @GetMapping("/getById")
-    public User getById(@RequestParam Long userId){
+    public User getById(@RequestParam Long userId) {
         User user = userMapper.selectByPrimaryKey(userId);
         return user;
     }
 
     @GetMapping(value = "/getJsonFileById", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public byte[] getJsonFileById(@RequestParam Long userId, HttpServletResponse response){
+    public byte[] getJsonFileById(@RequestParam Long userId, HttpServletResponse response) {
         User user = userMapper.selectByPrimaryKey(userId);
         String dataStr = JSON.toJSONString(user);
 
@@ -345,7 +345,7 @@ public class UserController {
         String uuid = UUID.randomUUID().toString();
 
         ZipEntrySource[] sources = {
-                new ByteSource(uuid+".json",dataStr.getBytes())
+                new ByteSource(uuid + ".json", dataStr.getBytes())
         };
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ZipUtil.pack(sources, baos);
@@ -358,9 +358,28 @@ public class UserController {
         return data;
     }
 
-    @GetMapping("/getByIds")
-    public List<User> getByIds(@RequestParam List<Long> userIds){
+    @GetMapping("/getMultiZipByIds")
+    public byte[] getMultiZipByIds(@RequestParam List<Long> userIds, HttpServletResponse response) throws IOException {
         List<User> users = userMapper.selectByIds(userIds);
-        return users;
+        List<ZipEntrySource> sources = new ArrayList<>();
+
+        for (User user : users) {
+            String userJsonStr = JSON.toJSONString(user);
+            ByteSource byteSource = new ByteSource(user.getUserId() + ".json", userJsonStr.getBytes());
+            sources.add(byteSource);
+        }
+
+        ZipEntrySource[] byteSources = sources.toArray(new ZipEntrySource[users.size()]);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipUtil.pack(byteSources, baos);
+        byte[] data = baos.toByteArray();
+        baos.close();
+
+        String uuid = UUID.randomUUID().toString();
+        String filename = uuid + ".zip";
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+
+        return data;
     }
 }
