@@ -21,6 +21,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.zeroturnaround.zip.ByteSource;
+import org.zeroturnaround.zip.ZipEntrySource;
+import org.zeroturnaround.zip.ZipUtil;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
@@ -332,6 +335,27 @@ public class UserController {
         response.setHeader("Content-Disposition", "attachment; filename=" + filename);
 
         return dataStr.getBytes();
+    }
+
+    @GetMapping(value = "/getZipFileById", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public byte[] getZipFileById(@RequestParam Long userId, HttpServletResponse response) throws IOException {
+        User user = userMapper.selectByPrimaryKey(userId);
+        String dataStr = JSON.toJSONString(user);
+
+        String uuid = UUID.randomUUID().toString();
+
+        ZipEntrySource[] sources = {
+                new ByteSource(uuid+".json",dataStr.getBytes())
+        };
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipUtil.pack(sources, baos);
+        byte[] data = baos.toByteArray();
+        baos.close();
+
+        String filename = uuid + ".zip";
+        response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+
+        return data;
     }
 
     @GetMapping("/getByIds")
