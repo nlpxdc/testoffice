@@ -17,12 +17,19 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.tika.Tika;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
+import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.BodyContentHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 import org.zeroturnaround.zip.ByteSource;
 import org.zeroturnaround.zip.ZipEntrySource;
 import org.zeroturnaround.zip.ZipUtil;
@@ -414,5 +421,23 @@ public class UserController {
         Tika tika = new Tika();
         String mediaType = tika.detect(file.getInputStream());
         return mediaType;
+    }
+
+    @PostMapping("/parseTxt")
+    public String parseTxt(@RequestParam("file") MultipartFile file) throws IOException, TikaException, SAXException {
+        Parser parser = new AutoDetectParser();
+        ContentHandler handler = new BodyContentHandler();
+        Metadata metadata = new Metadata();
+        ParseContext context = new ParseContext();
+
+        parser.parse(file.getInputStream(), handler, metadata, context);
+        return handler.toString();
+    }
+
+    @PostMapping("/parseTxt2")
+    public String parseTxt2(@RequestParam("file") MultipartFile file) throws IOException, TikaException, SAXException {
+        Tika tika = new Tika();
+        String content = tika.parseToString(file.getInputStream());
+        return content;
     }
 }
