@@ -14,6 +14,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tika.Tika;
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.http.MediaType;
@@ -394,5 +398,21 @@ public class UserController {
     @PostMapping("/importStreamXlsx")
     public void importStreamXlsx(@RequestParam("file") MultipartFile file) throws IOException {
         //N/A
+    }
+
+    @PostMapping("/detectType")
+    public String detectType(@RequestParam("file") MultipartFile file) throws IOException {
+        Detector detector = new DefaultDetector();
+        Metadata metadata = new Metadata();
+
+        org.apache.tika.mime.MediaType mediaType = detector.detect(file.getInputStream(), metadata);
+        return mediaType.toString();
+    }
+
+    @PostMapping("/detectType2")
+    public String detectType2(@RequestParam("file") MultipartFile file) throws IOException {
+        Tika tika = new Tika();
+        String mediaType = tika.detect(file.getInputStream());
+        return mediaType;
     }
 }
